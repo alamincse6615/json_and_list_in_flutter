@@ -1,8 +1,12 @@
 import 'dart:convert';
 
 import 'package:class_no_25/ProductDataModel.dart';
+import 'package:class_no_25/details.dart';
+import 'package:class_no_25/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+
 
 void main() {
   runApp(const MyApp());
@@ -37,37 +41,66 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
 
-  Future<List<ProductDataModel>> ReadJsonData() async {
-    final jsondata = await rootBundle.loadString('jsonfile/productlist.json');
-    final list = json.decode(jsondata) as List<dynamic>;
+  Future<List<ProductDataModel>> jsonfunction() async{
+    final jsonProduct = await rootBundle.loadString("jsonvuris/productlist.json");
+    final list = json.decode(jsonProduct) as List<dynamic>;
     return list.map((e) => ProductDataModel.fromJson(e)).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: FutureBuilder(
-          future: ReadJsonData(),
-            builder: (context,data){
-            var items = data.data as List<ProductDataModel>;
-              return ListView.builder(
-                  itemBuilder: (context, index){
-                    return Card(
-                      child: ListTile(
-
-                        leading:  CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              items[index].imageURL.toString()
+      body: FutureBuilder(
+        future: jsonfunction(),
+          builder: (context, badkdsa){
+          var list = badkdsa.data as List<ProductDataModel>;
+            return ListView.builder(
+                itemCount: list.length,
+                itemBuilder: (context,index){
+                  return InkWell(
+                    child: Card(
+                      elevation: 5,
+                      child: Row(
+                        children: [
+                          SizedBox(width: 30,),
+                          Image.network(
+                            list[index].imageURL.toString(),
+                            height: 100,
+                            width: 100,
                           ),
-                        ),
-                        title:  Text(items[index].name.toString()),
-                        subtitle:  Text(items[index].price.toString())
+                          SizedBox(width: 30,),
+                          Column(
+                            children: [
+                              Text("id : "+ list[index].id.toString(),),
+                              Text("name : "+ list[index].name.toString(),),
+                              Text("category : "+ list[index].category.toString(),),
+                              Text("oldPrice : "+ list[index].oldPrice.toString(),),
+                              Text("price : "+ list[index].price.toString(),),
+                            ],
+                          )
+                        ],
                       ),
-                    );
-                  }
-              );
-            }
-        )
+                    ),
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context)=>Details(
+                                list[index].id.toString(),
+                                list[index].name.toString(),
+                                list[index].category.toString(),
+                                list[index].imageURL.toString(),
+                                list[index].oldPrice.toString(),
+                                list[index].price.toString(),
+                              )
+                          )
+                      );
+                    },
+                  );
+                }
+            );
+          }
+      )
     );
   }
 }
